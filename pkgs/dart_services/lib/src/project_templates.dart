@@ -54,6 +54,7 @@ class ProjectTemplates {
 const Set<String> supportedFlutterPackages = {
   'animated_to',
   'animations',
+  'flutter_animate',
   'creator',
   'flame',
   'flame_fire_atlas',
