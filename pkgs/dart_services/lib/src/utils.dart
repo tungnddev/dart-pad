@@ -48,10 +48,12 @@ String normalizeImports(String imports) {
 /// Normalizes an absolute path by removing all occurrences of "..".
 String normalizeAbsolutePath(String filePath) {
   const parent = '..';
+  assert(path.isAbsolute(filePath));
   final parts = path.split(filePath);
-  assert(parts[0] == Platform.pathSeparator);
-  parts.removeAt(0);
-  assert(parts[0] != Platform.pathSeparator);
+  // The root part (e.g. '/' on POSIX, or 'D:\' on Windows) is kept as-is
+  // rather than assumed to be `Platform.pathSeparator`, since on Windows it
+  // also carries the drive letter.
+  final root = parts.removeAt(0);
 
   String? atOrNull(int index) {
     if (index < 0) return null;
@@ -71,7 +73,7 @@ String normalizeAbsolutePath(String filePath) {
     parts.removeAt(index - 1);
   }
 
-  return '${Platform.pathSeparator}${path.joinAll(parts)}';
+  return '$root${path.joinAll(parts)}';
 }
 
 Future<Process> runWithLogging(

@@ -240,14 +240,18 @@ Future<void> _buildStorageArtifacts(
     );
 
     copy(getFile(ddcModuleLoaderPath), artifactsDir);
-    copy(getFile(newSdkJsPath), artifactsDir);
-    copy(getFile('$newSdkJsPath.map'), artifactsDir);
-    joinFile(artifactsDir, [
-      'dart_sdk.js',
-    ]).copySync(path.join('artifacts', 'dart_sdk_new.js'));
-    joinFile(artifactsDir, [
-      'dart_sdk.js.map',
-    ]).copySync(path.join('artifacts', 'dart_sdk_new.js.map'));
+    // Copy directly to the final 'dart_sdk_new.js' name rather than bouncing
+    // through 'artifacts/dart_sdk.js': that filename collides with the AMD
+    // dart_sdk.js copied above, and since Flutter ships both SDK JS files
+    // with identical mtimes, grinder's copy() (which skips copies when the
+    // source and destination mtimes match) silently skips the overwrite,
+    // leaving the AMD file's content masquerading as the new-DDC SDK.
+    getFile(
+      newSdkJsPath,
+    ).copySync(joinFile(artifactsDir, ['dart_sdk_new.js']).path);
+    getFile(
+      '$newSdkJsPath.map',
+    ).copySync(joinFile(artifactsDir, ['dart_sdk_new.js.map']).path);
 
     copy(joinFile(dir, ['flutter_web_new.js']), artifactsDir);
     copy(joinFile(dir, ['flutter_web_new.js.map']), artifactsDir);
