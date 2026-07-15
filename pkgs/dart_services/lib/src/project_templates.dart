@@ -80,11 +80,41 @@ const Set<String> supportedFlutterPackages = {
   'video_player',
 };
 
+/// A private package sourced from a git repository.
+///
+/// These are baked into the pre-compiled Flutter summary (see `tool/grind.dart`)
+/// and allowed as imports, exactly like [supportedFlutterPackages] — but resolved
+/// via git rather than pub.dev. [supportedGitPackages] is the single source of
+/// truth: listing a package there makes it importable, template-resolvable, and
+/// baked into `flutter_web.dill`.
+class GitPackage {
+  final String url;
+  final String ref;
+
+  /// Set only when the package lives in a subdirectory of the repo.
+  final String? path;
+
+  const GitPackage({required this.url, required this.ref, this.path});
+}
+
+/// Private git-sourced packages. Add your own lib here.
+///
+/// Pin [GitPackage.ref] to an immutable commit SHA (or tag) so the baked summary
+/// stays in sync with what the template resolves.
+const Map<String, GitPackage> supportedGitPackages = {
+  // '<your_package_name>': GitPackage(
+  //   url: '<https://github.com/you/your_lib.git>',
+  //   ref: '<pinned-commit-sha-or-tag>',
+  //   // path: '<subdir/if/the/package/is/not/at/repo/root>',
+  // ),
+};
+
 /// The set of packages which indicate that Flutter Web is being used.
-const Set<String> _packagesIndicatingFlutter = {
+final Set<String> _packagesIndicatingFlutter = {
   'flutter',
   'flutter_test',
   ...supportedFlutterPackages,
+  ...supportedGitPackages.keys,
 };
 
 /// The set of basic Dart (non-Flutter) packages which can be directly imported

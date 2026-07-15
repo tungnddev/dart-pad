@@ -94,6 +94,7 @@ Future<void> _buildStorageArtifacts(
     includeFlutterWeb: true,
     dartLanguageVersion: sdk.dartVersion,
     dependencies: parsePubDependenciesFile(dependenciesFile: dependenciesFile),
+    gitDependencies: supportedGitPackages,
   );
   joinFile(dir, ['pubspec.yaml']).writeAsStringSync(pubspec);
 
@@ -138,7 +139,8 @@ Future<void> _buildStorageArtifacts(
     throw FileSystemException('package config not found', dir.toString());
   }
   for (final package in config.packages) {
-    if (_flutterPackages.contains(package.name)) {
+    if (_flutterPackages.contains(package.name) ||
+        supportedGitPackages.containsKey(package.name)) {
       // This is a package we're interested in - add all the public libraries to
       // the list.
       final libPath = package.packageUriRoot.toFilePath();

@@ -77,6 +77,7 @@ class ProjectCreator {
         includeFlutterWeb: true,
         dartLanguageVersion: _dartLanguageVersion,
         dependencies: dependencies,
+        gitDependencies: supportedGitPackages,
       ),
     );
 
@@ -146,6 +147,7 @@ String createPubspec({
   required bool includeFlutterWeb,
   required String dartLanguageVersion,
   Map<String, String> dependencies = const {},
+  Map<String, GitPackage> gitDependencies = const {},
 }) {
   var content =
       '''
@@ -165,6 +167,15 @@ dependencies:
   }
   dependencies.forEach((name, version) {
     content += '  $name: $version\n';
+  });
+  gitDependencies.forEach((name, git) {
+    content += '  $name:\n';
+    content += '    git:\n';
+    content += '      url: ${git.url}\n';
+    content += '      ref: ${git.ref}\n';
+    if (git.path != null) {
+      content += '      path: ${git.path}\n';
+    }
   });
 
   return content;
